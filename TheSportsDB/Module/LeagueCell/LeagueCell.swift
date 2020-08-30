@@ -17,11 +17,8 @@ class LeagueCell: UITableViewCell {
     }
 
     // MARK: - IBOutlet
-    @IBOutlet weak var name: UILabel!
-    @IBOutlet weak var sport: UILabel!
-
-    // MARK: - Properties
-    var league: League?
+    @IBOutlet private(set) weak var name: UILabel!
+    @IBOutlet private(set) weak var sport: UILabel!
     
     // MARK: - LifeCycle
     override func prepareForReuse() {
@@ -31,13 +28,7 @@ class LeagueCell: UITableViewCell {
     }
     
     func setUp(league: League) {
-        setUpDesign()
-        self.league = league
         name.text = league.strLeague
         sport.text = league.strSport
-    }
-
-    // MARK: - Privates
-    private func setUpDesign() {
     }
 }

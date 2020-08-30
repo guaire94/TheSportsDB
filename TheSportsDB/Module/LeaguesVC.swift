@@ -8,9 +8,7 @@
 
 import UIKit
 
-class SearchTeamsByLeagueVC: UIViewController {
-
-    // MARK: - Constants
+class LeaguesVC: UIViewController {
 
     // MARK: - IBOutlet
     @IBOutlet private(set) weak var searchBar: UISearchBar!
@@ -19,6 +17,12 @@ class SearchTeamsByLeagueVC: UIViewController {
     // MARK: - Properties
     private var leagues: [League] = [] {
         didSet {
+            filteredLeagues = leagues
+        }
+    }
+    
+    private var filteredLeagues: [League] = [] {
+        didSet {
             tableView.reloadData()
         }
     }
@@ -26,16 +30,11 @@ class SearchTeamsByLeagueVC: UIViewController {
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpUI()
         setUpTableView()
         getLeagues()
     }
     
     // MARK: - Private
-    private func setUpUI() {
-        
-    }
-    
     private func setUpTableView() {
         tableView.register(UINib(nibName: LeagueCell.Constants.identifier, bundle: nil),
                            forCellReuseIdentifier: LeagueCell.Constants.identifier)
@@ -48,7 +47,7 @@ class SearchTeamsByLeagueVC: UIViewController {
 }
 
 // MARK: - LeagueServiceDelegate
-extension SearchTeamsByLeagueVC: LeagueServiceDelegate {
+extension LeaguesVC: LeagueServiceDelegate {
     
     func didSuccessGetLeagues(result: LeagueResult) {
         leagues = result.leagues
@@ -59,10 +58,29 @@ extension SearchTeamsByLeagueVC: LeagueServiceDelegate {
     }
 }
 
+// MARK: - UISearchBarDelegate
+extension LeaguesVC: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard !searchText.isEmpty else {
+            filteredLeagues = leagues
+            return
+        }
+        filteredLeagues = leagues.filter { (league: League) -> Bool in
+          league.strLeague.lowercased().contains(searchText.lowercased())
+        }
+      }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+    }
+}
+
 // MARK: - UITableViewDataSource
-extension SearchTeamsByLeagueVC: UITableViewDataSource {
+extension LeaguesVC: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        leagues.count
+        filteredLeagues.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -72,24 +90,18 @@ extension SearchTeamsByLeagueVC: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let reusableCell = tableView.dequeueReusableCell(withIdentifier: LeagueCell.Constants.identifier, for: indexPath)
         guard let cell = reusableCell as? LeagueCell,
-            let league = leagues.safe[indexPath.row] else {
+            let league = filteredLeagues.safe[indexPath.row] else {
                 return UITableViewCell()
         }
         cell.setUp(league: league)
         return cell
-
     }
 }
 
 // MARK: - UITableViewDelegate
-extension SearchTeamsByLeagueVC: UITableViewDelegate {
+extension LeaguesVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     }
-}
-
-// MARK: - UISearchBarDelegate
-extension SearchTeamsByLeagueVC: UISearchBarDelegate {
-    
 }
 

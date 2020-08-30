@@ -19,12 +19,12 @@ public class LeagueService {
     weak var delegate: LeagueServiceDelegate?
 
     func getLeagues() {
-        LeagueEndpoint.getLeagues() { (success, result) in
+        LeagueEndpoint.getLeagues() { [weak self] (success, result) in
             guard success, let result = result else {
-                self.delegate?.didFailedGetLeagues()
+                self?.delegate?.didFailedGetLeagues()
                 return
             }
-            self.delegate?.didSuccessGetLeagues(result: result)
+            self?.delegate?.didSuccessGetLeagues(result: result)
         }
     }
 }
