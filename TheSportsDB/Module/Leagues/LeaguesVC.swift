@@ -63,7 +63,11 @@ class LeaguesVC: UIViewController {
 extension LeaguesVC: LeagueServiceDelegate {
     
     func didSuccessGetLeagues(result: LeagueResult) {
-        leagues = result.leagues
+        guard let leagues = result.leagues else {
+            navigationController?.popViewController(animated: true)
+            return
+        }
+        self.leagues = leagues
     }
     
     func didFailedGetLeagues() {

@@ -28,8 +28,10 @@ class TeamCell: UICollectionViewCell {
     }
     
     func setUp(team: Team) {
-        if let urlBadge = URL(string: team.strTeamBadge) {
+        if let teamBadge = team.strTeamBadge, let urlBadge = URL(string: teamBadge) {
             badge.kf.setImage(with: urlBadge)
+        } else {
+            badge.image = #imageLiteral(resourceName: "teamPlaceHolder")
         }
         name.text = team.strTeam
     }

@@ -13,6 +13,12 @@ class PlayersVC: UIViewController {
     // MARK: - Constants
     enum Constants {
         static var identifier: String = "PlayersVC"
+        
+        enum Error {
+            static var title: String = "Team info"
+            static var message: String = "For the moment, selected team have no available informations"
+            static var action: String = "Ok"
+        }
     }
 
     // MARK: - IBOutlet
@@ -45,17 +51,26 @@ class PlayersVC: UIViewController {
     }
     
     private func setUpTableView() {
-        tableView.register(UINib(nibName: LeagueCell.Constants.identifier, bundle: nil),
-                           forCellReuseIdentifier: LeagueCell.Constants.identifier)
+        tableView.register(UINib(nibName: PlayerCell.Constants.identifier, bundle: nil),
+                           forCellReuseIdentifier: PlayerCell.Constants.identifier)
     }
 
     private func getPlayers() {
         guard let idTeam = team?.idTeam else {
-            navigationController?.popViewController(animated: true)
+            showTeamError()
             return
         }
         PlayerService.shared.delegate = self
-        PlayerService.shared.getTeams(idTeam: idTeam)
+        PlayerService.shared.getPlayers(idTeam: idTeam)
+    }
+    
+    private func showTeamError() {
+        let alert = UIAlertController(title: Constants.Error.title,
+                                      message: Constants.Error.message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Constants.Error.action, style: .cancel) { [weak self] (_) in
+            self?.dismiss(animated: true, completion: nil)
+        })
+        present(alert, animated: true, completion: nil)
     }
 }
 
@@ -63,7 +78,11 @@ class PlayersVC: UIViewController {
 extension PlayersVC: PlayerServiceDelegate {
     
     func didSuccessGetPlayers(result: PlayerResult) {
-        players = result.players
+        guard let players = result.player else {
+            showTeamError()
+            return
+        }
+        self.players = players
     }
     
     func didFailedGetPlayers() {
@@ -72,7 +91,7 @@ extension PlayersVC: PlayerServiceDelegate {
 }
 
 // MARK: - UITableViewDataSource
-extension LeaguesVC: UITableViewDataSource {
+extension PlayersVC: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         players.count

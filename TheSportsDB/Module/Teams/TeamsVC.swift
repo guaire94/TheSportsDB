@@ -15,6 +15,13 @@ class TeamsVC: UIViewController {
         static var identifier: String = "TeamsVC"
         static var nbCellPerLine: CGFloat = 2.0
         static var nbSpacingBetweenCell: CGFloat = 10.0
+        
+        enum Error {
+            static var title: String = "League info"
+            static var message: String = "For the moment, selected league have no available informations"
+            static var action: String = "Ok"
+        }
+
     }
 
     // MARK: - IBOutlet
@@ -40,6 +47,14 @@ class TeamsVC: UIViewController {
         getTeams()
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let vc = segue.destination as? PlayersVC,
+            let team = sender as? Team else {
+                return
+        }
+        vc.team = team
+    }
+    
     // MARK: - Privates
     private func setUpLeagueInfo() {
         guard let name = league?.strLeague else {
@@ -56,11 +71,20 @@ class TeamsVC: UIViewController {
 
     private func getTeams() {
         guard let idLeague = league?.idLeague else {
-            navigationController?.popViewController(animated: true)
+            showLeagueError()
             return
         }
         TeamService.shared.delegate = self
         TeamService.shared.getTeams(idLeague: idLeague)
+    }
+    
+    private func showLeagueError() {
+        let alert = UIAlertController(title: Constants.Error.title,
+                                      message: Constants.Error.message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Constants.Error.action, style: .cancel) { [weak self] (_) in
+            self?.dismiss(animated: true, completion: nil)
+        })
+        present(alert, animated: true, completion: nil)
     }
 }
 
@@ -68,7 +92,11 @@ class TeamsVC: UIViewController {
 extension TeamsVC: TeamServiceDelegate {
     
     func didSuccessGetTeams(result: TeamResult) {
-        teams = result.teams
+        guard let teams = result.teams else {
+            showLeagueError()
+            return
+        }
+        self.teams = teams
     }
     
     func didFailedGetTeams() {
@@ -106,5 +134,6 @@ extension TeamsVC: UICollectionViewDelegateFlowLayout {
 extension TeamsVC: UICollectionViewDelegate {
             
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        performSegue(withIdentifier: PlayersVC.Constants.identifier, sender: teams.safe[indexPath.row])
     }
 }

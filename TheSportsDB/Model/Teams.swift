@@ -9,11 +9,11 @@
 import Foundation
 
 public struct TeamResult: Codable {
-    var teams: [Team]
+    var teams: [Team]?
 }
 
 public struct Team: Codable {
     var idTeam: String
     var strTeam: String
-    var strTeamBadge: String
+    var strTeamBadge: String?
 }

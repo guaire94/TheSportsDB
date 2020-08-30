@@ -23,6 +23,7 @@ public class API {
         
         case getLeagues
         case getTeams(idLeague: String)
+        case getPlayers(idTeam: String)
 
         func url() -> String {
             switch self {
@@ -30,6 +31,8 @@ public class API {
                 return "/all_leagues.php"
             case .getTeams(let idLeague):
                 return "/lookup_all_teams.php?id=\(idLeague)"
+            case .getPlayers(let idTeam):
+                return "/lookup_all_players.php?id=\(idTeam)"
             }
         }
     }

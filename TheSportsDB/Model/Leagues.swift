@@ -9,7 +9,7 @@
 import Foundation
 
 public struct LeagueResult: Codable {
-    var leagues: [League]
+    var leagues: [League]?
 }
 
 public struct League: Codable {
