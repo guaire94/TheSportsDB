@@ -10,6 +10,11 @@ import UIKit
 
 class LeaguesVC: UIViewController {
 
+    // MARK: - Constants
+    enum Constants {
+        static var identifier: String = "LeaguesVC"
+    }
+
     // MARK: - IBOutlet
     @IBOutlet private(set) weak var searchBar: UISearchBar!
     @IBOutlet private(set) weak var tableView: UITableView!
@@ -34,7 +39,15 @@ class LeaguesVC: UIViewController {
         getLeagues()
     }
     
-    // MARK: - Private
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let vc = segue.destination as? TeamsVC,
+            let league = sender as? League else {
+                return
+        }
+        vc.league = league
+    }
+    
+    // MARK: - Privates
     private func setUpTableView() {
         tableView.register(UINib(nibName: LeagueCell.Constants.identifier, bundle: nil),
                            forCellReuseIdentifier: LeagueCell.Constants.identifier)
@@ -102,6 +115,7 @@ extension LeaguesVC: UITableViewDataSource {
 extension LeaguesVC: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: TeamsVC.Constants.identifier, sender: filteredLeagues.safe[indexPath.row])
     }
 }
 

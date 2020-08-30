@@ -22,14 +22,14 @@ public class API {
     enum Method {
         
         case getLeagues
-        case search(name:String)
+        case getTeams(idLeague: String)
 
         func url() -> String {
             switch self {
             case .getLeagues:
                 return "/all_leagues.php"
-            case .search(let name):
-                return "/users/search?name=\(name)&limit=10"
+            case .getTeams(let idLeague):
+                return "/lookup_all_teams.php?id=\(idLeague)"
             }
         }
     }
